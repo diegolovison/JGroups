@@ -13,6 +13,9 @@ import java.util.Arrays;
  * @since  3.5
  */
 public class ByteArrayDataOutputStream implements DataOutput {
+
+    private static final byte[] EMPTY = new byte[]{};
+
     protected byte[]  buf;
     protected int     pos;
     protected boolean grow_exponentially; // if true, the buffer will double every time
@@ -202,5 +205,9 @@ public class ByteArrayDataOutputStream implements DataOutput {
             // System.out.printf("growing buffer from %d -> %d (pos=%d, bytes=%d)\n", buf.length, newCapacity, pos, bytes);
             buf=Arrays.copyOf(buf, newCapacity);
         }
+    }
+
+    public void reset() {
+        buf = EMPTY;
     }
 }

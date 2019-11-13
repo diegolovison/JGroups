@@ -13,6 +13,7 @@ import org.jgroups.util.Util;
  * @since  4.0
  */
 public class NoBundler implements Bundler {
+    private static final boolean enableReset = Boolean.getBoolean(System.getProperty("NoBundler.enableReset", "false"));
     protected TP                                       transport;
     protected Log                                      log;
 
@@ -28,6 +29,9 @@ public class NoBundler implements Bundler {
     public void send(Message msg) throws Exception {
         ByteArrayDataOutputStream out=new ByteArrayDataOutputStream((int)(msg.size() + 10));
         sendSingleMessage(msg, out);
+        if (enableReset) {
+            out.reset();
+        }
     }
 
 
