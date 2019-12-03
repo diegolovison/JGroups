@@ -2,6 +2,8 @@ package org.jgroups.protocols.pbcast;
 
 import org.jgroups.*;
 import org.jgroups.annotations.*;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.Protocol;
 import org.jgroups.stack.StateTransferInfo;
@@ -47,6 +49,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="Streaming state transfer protocol base class")
 public abstract class StreamingStateTransfer extends Protocol implements ProcessingQueue.Handler<Address> {
+
+    private static final Log log= LogFactory.getLog(StreamingStateTransfer.class);
 
     /*
      * ----------------------------------------------Properties -----------------------------------

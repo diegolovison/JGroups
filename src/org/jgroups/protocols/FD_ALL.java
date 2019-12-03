@@ -2,6 +2,8 @@ package org.jgroups.protocols;
 
 import org.jgroups.*;
 import org.jgroups.annotations.*;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 
@@ -27,6 +29,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="Failure detection based on simple heartbeat protocol")
 public class FD_ALL extends Protocol {
+
+    private static final Log log= LogFactory.getLog(FD_ALL.class);
     
     /* -----------------------------------------    Properties     -------------------------------------------------- */
 

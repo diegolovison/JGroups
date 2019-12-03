@@ -7,6 +7,8 @@ import org.jgroups.annotations.Property;
 import org.jgroups.blocks.executor.ExecutionService.DistributedFuture;
 import org.jgroups.blocks.executor.ExecutorEvent;
 import org.jgroups.blocks.executor.ExecutorNotification;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Streamable;
 import org.jgroups.util.Util;
@@ -31,6 +33,8 @@ import static org.jgroups.protocols.Executing.Type.RUN_REQUEST;
  */
 @MBean(description="Based class for executor service functionality")
 abstract public class Executing extends Protocol {
+
+    private static final Log log= LogFactory.getLog(Executing.class);
 
     @Property(description="bypasses message bundling if set")
     protected boolean bypass_bundling=true;

@@ -8,6 +8,8 @@ import org.jgroups.View;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 
@@ -41,6 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @MBean(description="Fragments messages larger than fragmentation size into smaller packets")
 public class FRAG extends Protocol {
+
+    private static final Log log= LogFactory.getLog(FRAG.class);
     
     /* -----------------------------------------    Properties     -------------------------------------------------- */
 

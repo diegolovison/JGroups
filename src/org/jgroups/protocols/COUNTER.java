@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 import org.jgroups.*;
 import org.jgroups.annotations.*;
 import org.jgroups.blocks.atomic.Counter;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 
@@ -19,6 +21,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="Protocol to maintain distributed atomic counters")
 public class COUNTER extends Protocol {
+
+    private static final Log log= LogFactory.getLog(COUNTER.class);
 
     @Property(description="Bypasses message bundling if true")
     protected boolean bypass_bundling=true;

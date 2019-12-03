@@ -7,6 +7,8 @@ import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.PropertyConverters;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.BoundedList;
 import org.jgroups.util.NameCache;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
  * @author Bela Ban
  */
 public class TCPPING extends Discovery {
+
+    private static final Log log= LogFactory.getLog(TCPPING.class);
 
     /* -----------------------------------------    Properties     --------------------------------------- */
 

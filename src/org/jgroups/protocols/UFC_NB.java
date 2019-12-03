@@ -5,6 +5,8 @@ import org.jgroups.Message;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Credit;
 import org.jgroups.util.NonBlockingCredit;
 
@@ -21,6 +23,9 @@ import java.util.function.Consumer;
  */
 @MBean(description="Simple non-blocking flow control protocol based on a credit system")
 public class UFC_NB extends UFC {
+
+    private static final Log log= LogFactory.getLog(UFC_NB.class);
+
     @Property(description="Max number of bytes of all queued messages for a given destination. If a given destination " +
       "has no credits left and the message cannot be added to the queue because it is full, then the sender thread " +
       "will be blocked until there is again space available in the queue, or the protocol is stopped.")

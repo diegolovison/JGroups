@@ -9,6 +9,8 @@ import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.ConfiguratorFactory;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 import org.w3c.dom.*;
@@ -31,6 +33,9 @@ import java.util.concurrent.TimeUnit;
 @MBean(description="Supervises the running stack, taking corrective actions if necessary")
 @Deprecated
 public class SUPERVISOR extends Protocol {
+
+    private static final Log log= LogFactory.getLog(SUPERVISOR.class);
+
     protected Address                     local_addr;
 
     protected volatile View               view;

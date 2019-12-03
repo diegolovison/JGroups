@@ -2,6 +2,8 @@ package org.jgroups.protocols;
 
 import org.jgroups.Address;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Responses;
 import org.jgroups.util.Util;
 
@@ -33,6 +35,8 @@ import java.util.List;
  * @since 2.12
  */
 public class JDBC_PING extends FILE_PING {
+
+    private static final Log log= LogFactory.getLog(JDBC_PING.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
 

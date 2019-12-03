@@ -3,6 +3,7 @@ package org.jgroups.protocols;
 import org.jgroups.Address;
 import org.jgroups.annotations.Property;
 import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Responses;
 import org.jgroups.util.Util;
 
@@ -20,6 +21,9 @@ import java.util.Map;
  * @author Gustavo Fernandes
  */
 public class RACKSPACE_PING extends FILE_PING {
+
+    private static final Log log= LogFactory.getLog(RACKSPACE_PING.class);
+
     private static final String UKService = "https://lon.auth.api.rackspacecloud.com/v1.0";
     private static final String USService = "https://auth.api.rackspacecloud.com/v1.0";
 

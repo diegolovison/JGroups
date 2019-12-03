@@ -5,6 +5,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
@@ -36,6 +38,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="RELAY protocol")
 public class RELAY extends Protocol {
+
+    private static final Log log= LogFactory.getLog(RELAY.class);
 
     /* ------------------------------------------    Properties     ---------------------------------------------- */
     @Property(description="Description of the local cluster, e.g. \"nyc\". This is added to every address, so it" +

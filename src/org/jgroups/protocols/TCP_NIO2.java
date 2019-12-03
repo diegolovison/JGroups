@@ -7,6 +7,8 @@ import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.blocks.cs.NioServer;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.ClosedChannelException;
@@ -24,6 +26,9 @@ import java.util.Collection;
  * @since 3.6.5
  */
 public class TCP_NIO2 extends BasicTCP {
+
+    private static final Log log= LogFactory.getLog(TCP_NIO2.class);
+
     protected NioServer server;
 
     @Property(description="The max number of outgoing messages that can get queued for a given peer connection " +

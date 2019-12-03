@@ -5,6 +5,8 @@ import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.blocks.locking.LockService;
 import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.CENTRAL_LOCK;
 import org.jgroups.protocols.CENTRAL_LOCK2;
 import org.jgroups.protocols.Locking;
@@ -25,6 +27,9 @@ import java.util.stream.Stream;
  */
 @Test(groups={Global.FUNCTIONAL,Global.EAP_EXCLUDED},singleThreaded=true,dataProvider="createLockingProtocol")
 public class LockService_JGRP_2234_Test {
+
+    private static final Log log= LogFactory.getLog(LockService_JGRP_2234_Test.class);
+
     protected JChannel            a, b, c, d;
     protected LockService         s1, s2, s3, s4;
     protected static final String LOCK="sample-lock";

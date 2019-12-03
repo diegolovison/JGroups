@@ -6,6 +6,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 import org.jgroups.util.UUID;
@@ -39,7 +41,8 @@ import java.util.stream.Collectors;
  */
 @MBean(description="Protocol to discover subgroups existing due to a network partition")
 public class MERGE3 extends Protocol {
-    
+
+    private static final Log log= LogFactory.getLog(MERGE3.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     @Property(description="Minimum time in ms before sending an info message")

@@ -4,6 +4,8 @@ import org.jgroups.*;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.MessageBatch;
 import org.jgroups.util.StackType;
@@ -32,6 +34,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="Server side STOPM protocol, STOMP clients can connect to it")
 public class STOMP extends Protocol implements Runnable {
+
+    private static final Log log= LogFactory.getLog(STOMP.class);
 
     /* -----------------------------------------    Properties     ----------------------------------------------- */
 

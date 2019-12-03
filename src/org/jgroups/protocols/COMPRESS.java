@@ -5,6 +5,8 @@ import org.jgroups.Header;
 import org.jgroups.Message;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.MessageBatch;
 import org.jgroups.util.Util;
@@ -27,7 +29,9 @@ import java.util.zip.Inflater;
  * @author Bela Ban
  */
 @MBean(description="Compresses messages to send and uncompresses received messages")
-public class COMPRESS extends Protocol {   
+public class COMPRESS extends Protocol {
+
+    private static final Log log= LogFactory.getLog(COMPRESS.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     

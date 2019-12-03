@@ -7,6 +7,8 @@ import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.LocalAddress;
 import org.jgroups.annotations.Property;
 import org.jgroups.blocks.cs.Receiver;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Util;
 
 import java.net.InetAddress;
@@ -21,6 +23,8 @@ import java.util.Set;
  * @author Bela Ban
  */
 public abstract class BasicTCP extends TP implements Receiver {
+
+    private static final Log log= LogFactory.getLog(BasicTCP.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     

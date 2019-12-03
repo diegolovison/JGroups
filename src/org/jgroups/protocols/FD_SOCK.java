@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 import org.jgroups.*;
 import org.jgroups.annotations.*;
 import org.jgroups.blocks.LazyRemovalCache;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
@@ -38,6 +40,9 @@ import java.util.function.Supplier;
  */
 @MBean(description="Failure detection protocol based on sockets connecting members")
 public class FD_SOCK extends Protocol implements Runnable {
+
+    private static final Log log= LogFactory.getLog(FD_SOCK.class);
+
     protected static final int NORMAL_TERMINATION=9;
     protected static final int ABNORMAL_TERMINATION=-1;
 

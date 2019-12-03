@@ -6,6 +6,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 
@@ -33,6 +35,9 @@ import java.util.function.Supplier;
  */
 @MBean(description="Implementation of total order protocol using a sequencer")
 public class SEQUENCER extends Protocol {
+
+    private static final Log log= LogFactory.getLog(SEQUENCER.class);
+
     protected Address                           local_addr;
     protected volatile Address                  coord;
     protected volatile View                     view;

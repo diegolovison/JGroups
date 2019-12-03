@@ -7,6 +7,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
 import org.jgroups.auth.sasl.*;
 import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.protocols.pbcast.GMS.GmsHeader;
 import org.jgroups.protocols.pbcast.JoinRsp;
@@ -32,6 +34,9 @@ import java.util.Map;
 @MBean(description = "Provides SASL authentication")
 @Deprecated
 public class SASL extends Protocol {
+
+    private static final Log log= LogFactory.getLog(SASL.class);
+
     public static final short GMS_ID = ClassConfigurator.getProtocolId(GMS.class);
     public static final short SASL_ID = ClassConfigurator.getProtocolId(SASL.class);
     public static final String SASL_PROTOCOL_NAME = "jgroups";

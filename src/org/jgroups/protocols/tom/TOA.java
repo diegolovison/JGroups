@@ -12,6 +12,8 @@ import org.jgroups.View;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 
 /**
@@ -26,6 +28,9 @@ import org.jgroups.stack.Protocol;
  */
 @MBean(description = "Implementation of Total Order Anycast based on Skeen's Algorithm")
 public class TOA extends Protocol implements DeliveryProtocol {
+
+    private static final Log log= LogFactory.getLog(TOA.class);
+
     //managers
     private DeliveryManagerImpl deliverManager;
     private SenderManager senderManager;

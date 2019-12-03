@@ -8,6 +8,8 @@ import org.jgroups.annotations.XmlAttribute;
 import org.jgroups.auth.AuthToken;
 import org.jgroups.auth.X509Token;
 import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.protocols.pbcast.JoinRsp;
 import org.jgroups.stack.Protocol;
@@ -39,6 +41,8 @@ import java.util.List;
 })
 @MBean(description="Provides authentication of joiners, to prevent un-authorized joining of a cluster")
 public class AUTH extends Protocol {
+
+    private static final Log log= LogFactory.getLog(AUTH.class);
 
     /** Used on the coordinator to authentication joining member requests against */
     protected AuthToken             auth_token;

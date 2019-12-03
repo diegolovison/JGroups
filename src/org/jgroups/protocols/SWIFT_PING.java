@@ -5,6 +5,7 @@ import org.jgroups.Address;
 import org.jgroups.annotations.Experimental;
 import org.jgroups.annotations.Property;
 import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Responses;
 import org.jgroups.util.Util;
 
@@ -26,6 +27,8 @@ import java.util.*;
  */
 @Experimental
 public class SWIFT_PING extends FILE_PING {
+
+    private static final Log log= LogFactory.getLog(SWIFT_PING.class);
 
     protected SwiftClient swiftClient;
 

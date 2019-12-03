@@ -7,6 +7,8 @@ import org.jgroups.View;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.*;
 
 import java.util.Collection;
@@ -36,6 +38,9 @@ import java.util.stream.Stream;
  * @see CENTRAL_LOCK
  */
 public class CENTRAL_LOCK2 extends Locking {
+
+    private static final Log log= LogFactory.getLog(CENTRAL_LOCK2.class);
+
     @Property(description="By default, a lock owner is address:thread-id. If false, we only use the node's address. " +
       "See https://issues.jboss.org/browse/JGRP-1886 for details")
     protected boolean                                   use_thread_id_for_lock_owner=true;

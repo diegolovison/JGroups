@@ -6,6 +6,8 @@ import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.Experimental;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.GossipData;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.RouterStub;
@@ -38,6 +40,8 @@ import java.util.Objects;
  */
 @Experimental
 public class TUNNEL extends TP implements RouterStub.StubReceiver {
+
+    private static final Log log= LogFactory.getLog(TUNNEL.class);
 
     public interface TUNNELPolicy {
         void sendToAllMembers(String group, Address sender, byte[] data, int offset, int length) throws Exception;

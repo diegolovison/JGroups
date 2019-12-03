@@ -6,6 +6,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.TP;
 import org.jgroups.protocols.pbcast.GmsImpl.Request;
 import org.jgroups.stack.DiagnosticsHandler;
@@ -34,6 +36,9 @@ import static org.jgroups.Message.Flag.OOB;
  */
 @MBean(description="Group membership protocol")
 public class GMS extends Protocol implements DiagnosticsHandler.ProbeHandler {
+
+    private static final Log log= LogFactory.getLog(GMS.class);
+
     protected static final String CLIENT="Client";
     protected static final String COORD="Coordinator";
     protected static final String PART="Participant";

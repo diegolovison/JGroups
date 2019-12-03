@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 import org.jgroups.Event;
 import org.jgroups.Message;
 import org.jgroups.annotations.*;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Util;
 
@@ -20,6 +22,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @Experimental
 @MBean(description="Limits the sending rate to max_bytes per time_period")
 public class RATE_LIMITER extends Protocol {
+
+    private static final Log log= LogFactory.getLog(RATE_LIMITER.class);
 
     @Property(description="Max number of bytes to be sent in time_period ms. Blocks the sender if exceeded until a new " +
             "time period has started")

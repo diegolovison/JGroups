@@ -4,6 +4,8 @@ import org.jgroups.Address;
 import org.jgroups.View;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedOperation;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.NameCache;
@@ -26,6 +28,8 @@ import java.util.Map;
  */
 @MBean(description="Protocol to inject an arbitrary view in nodes")
 public class INJECT_VIEW extends Protocol {
+
+    private static final Log log= LogFactory.getLog(INJECT_VIEW.class);
 
     public static final String NODE_VIEWS_SEPARATOR = ";";
     public static final String VIEW_SEPARATOR = "=";

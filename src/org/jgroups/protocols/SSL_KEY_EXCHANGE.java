@@ -7,6 +7,8 @@ import org.jgroups.View;
 import org.jgroups.annotations.LocalAddress;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.Runner;
 import org.jgroups.util.Tuple;
@@ -36,6 +38,8 @@ import java.util.Objects;
   "(key server) to fetch a shared secret group key from the key server. That shared (symmetric) key is subsequently " +
   "used to encrypt communication between cluster members")
 public class SSL_KEY_EXCHANGE extends KeyExchange {
+
+    private static final Log log= LogFactory.getLog(SSL_KEY_EXCHANGE.class);
 
     protected enum Type {
         SECRET_KEY_REQ,

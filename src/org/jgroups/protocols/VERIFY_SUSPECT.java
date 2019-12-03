@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 
 import org.jgroups.*;
 import org.jgroups.annotations.*;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Util;
@@ -27,6 +29,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="Double-checks suspicions reports")
 public class VERIFY_SUSPECT extends Protocol implements Runnable {
+
+    private static final Log log= LogFactory.getLog(VERIFY_SUSPECT.class);
 
     /* ------------------------------------------ Properties  ------------------------------------------ */
     

@@ -6,6 +6,8 @@ import org.jgroups.Message;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.CreditMap;
 import org.jgroups.util.Tuple;
 
@@ -36,6 +38,9 @@ import java.util.concurrent.TimeUnit;
  */
 @MBean(description="Simple flow control protocol based on a credit system")
 public class MFC extends FlowControl {
+
+    private static final Log log= LogFactory.getLog(MFC.class);
+
     protected final static FcHeader MFC_REPLENISH_HDR      = new FcHeader(FcHeader.REPLENISH);
     protected final static FcHeader MFC_CREDIT_REQUEST_HDR = new FcHeader(FcHeader.CREDIT_REQUEST);
     

@@ -4,6 +4,8 @@ import org.jgroups.*;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Average;
 import org.jgroups.util.MessageBatch;
@@ -25,6 +27,9 @@ import java.util.function.Supplier;
  */
 @MBean(description="Measures latency between PERF instances")
 public class PERF extends Protocol {
+
+    private static final Log log= LogFactory.getLog(PERF.class);
+
     protected Average avg;
     protected Address local_addr;
 

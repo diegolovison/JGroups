@@ -6,6 +6,8 @@ import org.jgroups.Message;
 import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.Discovery;
 import org.jgroups.protocols.PingData;
 import org.jgroups.protocols.PingHeader;
@@ -18,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 public class DNS_PING extends Discovery {
+
+    private static final Log log= LogFactory.getLog(DNS_PING.class);
 
     private static final String DEFAULT_DNS_FACTORY = "com.sun.jndi.dns.DnsContextFactory";
     private static final String DEFAULT_DNS_RECORD_TYPE = "A";

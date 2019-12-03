@@ -5,6 +5,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Bits;
 import org.jgroups.util.Credit;
@@ -26,6 +28,8 @@ import java.util.TreeMap;
  */
 @MBean(description="Simple flow control protocol based on a credit system")
 public abstract class FlowControl extends Protocol {
+
+    private static final Log log= LogFactory.getLog(FlowControl.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     

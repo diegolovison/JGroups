@@ -4,6 +4,8 @@ import org.jgroups.*;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.stack.StateTransferInfo;
 import org.jgroups.util.Digest;
@@ -31,6 +33,9 @@ import java.util.function.Supplier;
  */
 @MBean(description="State transfer protocol based on byte array transfer")
 public class STATE_TRANSFER extends Protocol implements ProcessingQueue.Handler<Address> {
+
+    private static final Log log= LogFactory.getLog(STATE_TRANSFER.class);
+
     protected long                           start, stop; // to measure state transfer time
     protected final LongAdder                num_state_reqs=new LongAdder();
     protected final LongAdder                num_bytes_sent=new LongAdder();

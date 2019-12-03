@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 import org.jgroups.*;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Bits;
 import org.jgroups.util.MessageBatch;
@@ -24,6 +26,9 @@ import java.util.function.Supplier;
  */
 @MBean(description="Maintains mappings of addresses and their logical names")
 public class NAMING extends Protocol {
+
+    private static final Log log= LogFactory.getLog(NAMING.class);
+
     protected Address       local_addr;
     protected volatile View view;
 

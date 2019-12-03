@@ -2,6 +2,8 @@ package org.jgroups.protocols.pbcast;
 
 import org.jgroups.*;
 import org.jgroups.annotations.*;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.TCP;
 import org.jgroups.protocols.TP;
 import org.jgroups.stack.DiagnosticsHandler;
@@ -38,6 +40,9 @@ import java.util.function.Supplier;
  */
 @MBean(description="Reliable transmission multipoint FIFO protocol")
 public class NAKACK2 extends Protocol implements DiagnosticsHandler.ProbeHandler {
+
+    private static final Log log= LogFactory.getLog(NAKACK2.class);
+
     protected static final int NUM_REBROADCAST_MSGS=3;
 
     /* -----------------------------------------------------    Properties     --------------------- ------------------------------------ */

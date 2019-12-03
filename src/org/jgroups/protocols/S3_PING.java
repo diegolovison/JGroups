@@ -2,6 +2,8 @@ package org.jgroups.protocols;
 
 import org.jgroups.Address;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Base64;
 import org.jgroups.util.Responses;
 import org.jgroups.util.Util;
@@ -34,6 +36,8 @@ import java.util.*;
  */
 @Deprecated
 public class S3_PING extends FILE_PING {
+
+    private static final Log log= LogFactory.getLog(S3_PING.class);
 
     @Property(description="The name of the AWS server")
     protected String host;

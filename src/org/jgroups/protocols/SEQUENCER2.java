@@ -6,6 +6,8 @@ import org.jgroups.annotations.Experimental;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Bits;
 import org.jgroups.util.MessageBatch;
@@ -39,6 +41,9 @@ import java.util.function.Supplier;
 @Experimental
 @MBean(description="Implementation of total order protocol using a sequencer (unicast-unicast-multicast)")
 public class SEQUENCER2 extends Protocol {
+
+    private static final Log log= LogFactory.getLog(SEQUENCER2.class);
+
     protected Address                           local_addr;
     protected volatile Address                  coord;
     protected volatile View                     view;

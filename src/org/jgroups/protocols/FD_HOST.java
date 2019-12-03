@@ -8,6 +8,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
@@ -37,6 +39,8 @@ import java.util.concurrent.TimeUnit;
 @MBean(description="Failure detection protocol which detects crashes or hangs of entire hosts and suspects " +
   "all cluster members on those hosts")
 public class FD_HOST extends Protocol {
+
+    private static final Log log= LogFactory.getLog(FD_HOST.class);
 
     @Property(description="The command used to check a given host for liveness. Example: \"ping\". " +
       "If null, InetAddress.isReachable() will be used by default")

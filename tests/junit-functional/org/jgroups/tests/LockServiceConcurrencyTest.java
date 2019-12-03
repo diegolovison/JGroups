@@ -5,6 +5,8 @@ import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.blocks.locking.LockService;
 import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.CENTRAL_LOCK;
 import org.jgroups.protocols.CENTRAL_LOCK2;
 import org.jgroups.protocols.Locking;
@@ -26,6 +28,9 @@ import java.util.concurrent.locks.Lock;
  */
 @Test(groups={Global.BYTEMAN,Global.EAP_EXCLUDED},singleThreaded=true,dataProvider="createLockingProtocol")
 public class LockServiceConcurrencyTest {
+
+    private static final Log log= LogFactory.getLog(LockServiceConcurrencyTest.class);
+
     protected JChannel           a, b;
     protected LockService        ls_a, ls_b;
 

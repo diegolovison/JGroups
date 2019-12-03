@@ -4,6 +4,8 @@ import org.jgroups.Address;
 import org.jgroups.View;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Util;
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ import java.util.Set;
  * @since 2.12.0
  */
 public class CENTRAL_EXECUTOR extends Executing {
+
+    private static final Log log= LogFactory.getLog(CENTRAL_EXECUTOR.class);
 
     @Property(description="Number of backups to the coordinator.  Queue State gets replicated to these nodes as well")
     protected int num_backups=1;

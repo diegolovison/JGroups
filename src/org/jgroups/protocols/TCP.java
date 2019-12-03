@@ -7,6 +7,8 @@ import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.blocks.cs.TcpServer;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.SocketFactory;
 
 import java.util.Collection;
@@ -29,6 +31,9 @@ import java.util.Collection;
  * @author Bela Ban
  */
 public class TCP extends BasicTCP {
+
+    private static final Log log= LogFactory.getLog(TCP.class);
+
     protected TcpServer server;
 
     public TCP() {}

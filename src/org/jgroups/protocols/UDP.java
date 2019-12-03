@@ -7,6 +7,8 @@ import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.SuppressLog;
 import org.jgroups.util.Util;
@@ -47,6 +49,8 @@ import java.util.Map;
  * @author Bela Ban
  */
 public class UDP extends TP {
+
+    private static final Log log= LogFactory.getLog(UDP.class);
 
     /* ------------------------------------------ Properties  ------------------------------------------ */
 

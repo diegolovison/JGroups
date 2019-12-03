@@ -6,6 +6,8 @@ import org.jgroups.Message;
 import org.jgroups.annotations.LocalAddress;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.PropertyConverters;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.*;
 
 import java.io.*;
@@ -21,7 +23,8 @@ import java.util.*;
  * @author Bela Ban
  */
 public class MPING extends PING implements Runnable {
-    
+
+    private static final Log log= LogFactory.getLog(MPING.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
 

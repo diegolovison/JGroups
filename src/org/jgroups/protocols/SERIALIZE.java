@@ -5,6 +5,8 @@ import org.jgroups.Event;
 import org.jgroups.Message;
 import org.jgroups.annotations.MBean;
 import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Buffer;
@@ -24,6 +26,8 @@ import org.jgroups.util.Util;
  */
 @MBean(description="Serializes entire message into the payload of another message")
 public class SERIALIZE extends Protocol {
+
+    private static final Log log= LogFactory.getLog(SERIALIZE.class);
 
     protected static final short GMS_ID=ClassConfigurator.getProtocolId(GMS.class);
     //@Property(description="If true, messages with no payload will not be serialized")

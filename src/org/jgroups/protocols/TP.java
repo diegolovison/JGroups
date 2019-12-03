@@ -52,6 +52,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @MBean(description="Transport protocol")
 public abstract class TP extends Protocol implements DiagnosticsHandler.ProbeHandler, AdditionalJmxObjects {
 
+    private static final Log   log= LogFactory.getLog(TP.class);
+
     public static final    byte    LIST=1; // we have a list of messages rather than a single message when set
     public static final    byte    MULTICAST=2; // message is a multicast (versus a unicast) message when set
     public static final    int     MSG_OVERHEAD=Global.SHORT_SIZE + Global.BYTE_SIZE; // version + flags

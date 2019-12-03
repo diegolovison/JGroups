@@ -7,6 +7,8 @@ import org.jgroups.View;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.NameCache;
 import org.jgroups.util.Responses;
 import org.jgroups.util.TimeScheduler;
@@ -30,6 +32,9 @@ import java.util.stream.Collectors;
  * @author Bela Ban
  */
 public class FILE_PING extends Discovery {
+
+    private static final Log log= LogFactory.getLog(FILE_PING.class);
+
     protected static final String SUFFIX=".list";
     protected static final Pattern regexp=Pattern.compile("[\0<>:\"/\\|?*]");
 

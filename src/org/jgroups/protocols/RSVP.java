@@ -4,6 +4,8 @@ import org.jgroups.*;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.AckCollector;
 import org.jgroups.util.MessageBatch;
@@ -26,6 +28,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="Implements synchronous acks for messages which have their RSVP flag set)")
 public class RSVP extends Protocol {
+
+    private static final Log log= LogFactory.getLog(RSVP.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     @Property(description="Max time in milliseconds to block for an RSVP'ed message (0 blocks forever).")

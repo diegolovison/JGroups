@@ -11,6 +11,7 @@ import org.jgroups.conf.ProtocolConfiguration;
 import org.jgroups.jmx.AdditionalJmxObjects;
 import org.jgroups.jmx.ResourceDMBean;
 import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.TP;
 import org.jgroups.util.MessageBatch;
 import org.jgroups.util.StackType;
@@ -39,6 +40,9 @@ import java.util.regex.Pattern;
  */
 public class ProtocolStack extends Protocol {
     public enum Position {ABOVE, BELOW};
+
+    private static final Log   log= LogFactory.getLog(ProtocolStack.class);
+
     protected static final String max_list_print_size="max-list-print-size";
 
     protected Protocol            top_prot;

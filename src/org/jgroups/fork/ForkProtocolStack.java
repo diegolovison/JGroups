@@ -4,6 +4,8 @@ import org.jgroups.Address;
 import org.jgroups.Event;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.FORK;
 import org.jgroups.stack.Protocol;
 import org.jgroups.stack.ProtocolStack;
@@ -20,6 +22,9 @@ import java.util.concurrent.ConcurrentMap;
  * @since  3.4
  */
 public class ForkProtocolStack extends ProtocolStack {
+
+    private static final Log log= LogFactory.getLog(ForkProtocolStack.class);
+
     protected       Address                        local_addr;
     protected final String                         fork_stack_id;
     protected final ConcurrentMap<String,JChannel> fork_channels=new ConcurrentHashMap<>();

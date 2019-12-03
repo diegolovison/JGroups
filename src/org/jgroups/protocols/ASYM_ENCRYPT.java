@@ -5,6 +5,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.util.*;
 
@@ -43,6 +45,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @MBean(description="Asymmetric encryption protocol. The secret key for encryption and decryption of messages is fetched " +
   "from a key server (the coordinator) via asymmetric encryption")
 public class ASYM_ENCRYPT extends Encrypt<KeyStore.PrivateKeyEntry> {
+
+    private static final Log log= LogFactory.getLog(ASYM_ENCRYPT.class);
+
     protected static final short                GMS_ID=ClassConfigurator.getProtocolId(GMS.class);
 
     @Property(description="When a node leaves, change the secret group key, preventing old members from eavesdropping")

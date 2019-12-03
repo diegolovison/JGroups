@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 import org.jgroups.*;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.NameCache;
 import org.jgroups.util.Responses;
 import org.jgroups.util.Tuple;
@@ -22,6 +24,9 @@ import java.util.function.Function;
  * @since  4.1.3
  */
 public class LOCAL_PING extends Discovery {
+
+    private static final Log log= LogFactory.getLog(LOCAL_PING.class);
+
     /** Map of cluster names and address-protocol mappings. Used for routing messages to all or single members */
     protected static final Map<String,List<PingData>>      discovery=new ConcurrentHashMap<>();
     protected static final Function<String,List<PingData>> FUNC=k -> new ArrayList<>();

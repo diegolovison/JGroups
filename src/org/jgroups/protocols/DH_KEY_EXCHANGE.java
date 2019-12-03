@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 import org.jgroups.*;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.MessageBatch;
 import org.jgroups.util.Tuple;
 import org.jgroups.util.Util;
@@ -31,6 +33,8 @@ import java.util.function.Supplier;
 @MBean(description="Key exchange protocol to fetch a shared secret group key from the key server." +
   "That shared (symmetric) key is subsequently used to encrypt communication between cluster members")
 public class DH_KEY_EXCHANGE extends KeyExchange {
+
+    private static final Log log= LogFactory.getLog(DH_KEY_EXCHANGE.class);
 
     protected enum Type {
         // sent from joiner to key server, carries dh_key

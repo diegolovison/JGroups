@@ -5,6 +5,8 @@ import org.jgroups.annotations.Experimental;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.*;
 
@@ -25,6 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Experimental
 @MBean(description="Simple TCP based transport")
 public class SimpleTCP extends TP {
+
+    private static final Log log= LogFactory.getLog(SimpleTCP.class);
 
     @Property(description="size in bytes of TCP receiver window")
     protected int recv_buf_size=500000;

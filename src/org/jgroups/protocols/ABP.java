@@ -5,6 +5,8 @@ import org.jgroups.annotations.Experimental;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
 import org.jgroups.annotations.Unsupported;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.ConcurrentLinkedBlockingQueue;
 import org.jgroups.util.TimeScheduler;
@@ -29,6 +31,8 @@ import java.util.function.Supplier;
 @Experimental @Unsupported @Deprecated
 @MBean(description="Alternating Bit Protocol, for reliable p2p unicasts")
 public class ABP extends Protocol {
+
+    private static final Log log= LogFactory.getLog(ABP.class);
 
     @Property(description="Interval (in ms) at which a sent msg is resent")
     protected long resend_interval=1000;

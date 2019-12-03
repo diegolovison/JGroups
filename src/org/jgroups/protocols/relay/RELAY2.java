@@ -3,6 +3,8 @@ package org.jgroups.protocols.relay;
 import org.jgroups.*;
 import org.jgroups.annotations.*;
 import org.jgroups.conf.ConfiguratorFactory;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.FORWARD_TO_COORD;
 import org.jgroups.protocols.TP;
 import org.jgroups.protocols.relay.config.RelayConfig;
@@ -32,6 +34,9 @@ import java.util.function.Supplier;
 @XmlElement(name="RelayConfiguration",type="relay:RelayConfigurationType")
 @MBean(description="RELAY2 protocol")
 public class RELAY2 extends Protocol {
+
+    private static final Log log= LogFactory.getLog(RELAY2.class);
+
     // reserved flags
     public static final short site_master_flag            = 1 << 0;
     public static final short can_become_site_master_flag = 1 << 1;

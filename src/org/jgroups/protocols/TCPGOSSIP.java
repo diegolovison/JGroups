@@ -8,6 +8,8 @@ import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.PropertyConverters;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.RouterStub;
 import org.jgroups.stack.RouterStubManager;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
  * @since a long time ago
  */
 public class TCPGOSSIP extends Discovery implements RouterStub.MembersNotification {
+
+    private static final Log log= LogFactory.getLog(TCPGOSSIP.class);
     
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     

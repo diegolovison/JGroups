@@ -3,6 +3,8 @@ package org.jgroups.protocols;
 import org.jgroups.*;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.Bits;
 import org.jgroups.util.ForwardQueue;
@@ -33,6 +35,8 @@ import java.util.function.Supplier;
  */
 @MBean(description="Forwards unicast messages to the current coordinator")
 public class FORWARD_TO_COORD extends Protocol {
+
+    private static final Log log= LogFactory.getLog(FORWARD_TO_COORD.class);
 
     /** the address of the current coordinator, all msgs are forwarded to it */
     protected volatile Address        coord=null;

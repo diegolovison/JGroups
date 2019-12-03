@@ -38,6 +38,9 @@ import java.util.*;
  * @author Bela Ban
  */
 public abstract class Protocol {
+
+    private static final Log   log=LogFactory.getLog(Protocol.class);
+
     protected Protocol         up_prot, down_prot;
     protected ProtocolStack    stack;
     
@@ -54,11 +57,6 @@ public abstract class Protocol {
     @Property(description="Give the protocol a different ID if needed so we can have multiple " +
             "instances of it in the same stack",writable=false)
     protected short            id=ClassConfigurator.getProtocolId(getClass());
-
-    protected final Log        log=LogFactory.getLog(this.getClass());
-
-
-
 
     /**
      * Sets the level of a logger. This method is used to dynamically change the logging level of a running system,

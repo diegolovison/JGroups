@@ -2,6 +2,8 @@ package org.jgroups.protocols;
 
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 
 import javax.crypto.SecretKey;
 import java.io.FileInputStream;
@@ -34,6 +36,8 @@ import java.security.KeyStore;
 @MBean(description="Symmetric encryption protocol. The (shared) shared secret key is configured up front, " +
   "e.g. via a key store, or injection")
 public class SYM_ENCRYPT extends Encrypt<KeyStore.SecretKeyEntry> {
+
+    private static final Log log= LogFactory.getLog(SYM_ENCRYPT.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     @Property(description="File on classpath that contains keystore repository")

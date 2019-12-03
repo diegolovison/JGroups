@@ -2,6 +2,8 @@ package org.jgroups.protocols.pbcast;
 
 import org.jgroups.*;
 import org.jgroups.annotations.MBean;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.BlockingInputStream;
 import org.jgroups.util.StateTransferResult;
 import org.jgroups.util.Tuple;
@@ -30,6 +32,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @MBean(description="Streaming state transfer protocol")
 public class STATE extends StreamingStateTransfer {
+
+    private static final Log log= LogFactory.getLog(STATE.class);
 
 
     /*

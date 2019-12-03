@@ -8,6 +8,8 @@ import org.jgroups.annotations.Property;
 import org.jgroups.blocks.locking.AwaitInfo;
 import org.jgroups.blocks.locking.LockInfo;
 import org.jgroups.blocks.locking.LockNotification;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
  */
 @MBean(description="Based class for locking functionality")
 abstract public class Locking extends Protocol {
+
+    private static final Log log= LogFactory.getLog(Locking.class);
 
     @Property(description="bypasses message bundling if set")
     protected boolean                                bypass_bundling=true;

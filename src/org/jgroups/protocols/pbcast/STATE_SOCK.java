@@ -8,6 +8,8 @@ import org.jgroups.annotations.LocalAddress;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.PropertyConverters;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.StateTransferResult;
 import org.jgroups.util.Tuple;
@@ -41,6 +43,8 @@ import java.util.concurrent.RejectedExecutionException;
  */
 @MBean(description="State trasnfer protocol based on streaming state transfer")
 public class STATE_SOCK extends StreamingStateTransfer {
+
+    private static final Log log= LogFactory.getLog(STATE_SOCK.class);
 
     /*
      * ----------------------------------------------Properties -----------------------------------

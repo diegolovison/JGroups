@@ -6,6 +6,8 @@ import org.jgroups.Event;
 import org.jgroups.Message;
 import org.jgroups.View;
 import org.jgroups.annotations.*;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.MessageBatch;
 
@@ -23,6 +25,9 @@ import java.util.List;
  */
 @MBean(description="Discards messages")
 public class DISCARD extends Protocol {
+
+    private static final Log log= LogFactory.getLog(DISCARD.class);
+
     @Property
     protected double                    up;    // probability of dropping up   msgs
 

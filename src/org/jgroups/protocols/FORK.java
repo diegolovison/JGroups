@@ -9,6 +9,8 @@ import org.jgroups.fork.ForkConfig;
 import org.jgroups.fork.ForkProtocol;
 import org.jgroups.fork.ForkProtocolStack;
 import org.jgroups.fork.UnknownForkHandler;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Configurator;
 import org.jgroups.stack.Protocol;
 import org.jgroups.stack.ProtocolStack;
@@ -38,6 +40,9 @@ import java.util.function.Supplier;
 @XmlElement(name="fork-stacks",type="fork:ForkStacksType")
 @MBean(description="Implementation of FORK protocol")
 public class FORK extends Protocol {
+
+    private static final Log log= LogFactory.getLog(FORK.class);
+
     public static short ID=ClassConfigurator.getProtocolId(FORK.class);
 
     @Property(description="Points to an XML file defining the fork-stacks, which will be created at initialization. " +

@@ -2,6 +2,8 @@ package org.jgroups.protocols;
 
 import org.jgroups.Message;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.ByteArrayDataInputStream;
 import org.jgroups.util.ByteArrayDataOutputStream;
 import org.jgroups.util.Util;
@@ -20,6 +22,7 @@ import java.net.SocketException;
  */
 public class BPING extends PING implements Runnable {
 
+    private static final Log log= LogFactory.getLog(BPING.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
 

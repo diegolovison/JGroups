@@ -5,6 +5,8 @@ import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.View;
 import org.jgroups.conf.ClassConfigurator;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.protocols.FRAG2;
 import org.jgroups.protocols.FRAG3;
 import org.jgroups.protocols.pbcast.GMS;
@@ -31,6 +33,9 @@ import java.util.List;
  */
 @Test(groups=Global.FUNCTIONAL,singleThreaded=true)
 public class DeltaViewTest {
+
+    private static final Log log= LogFactory.getLog(DeltaViewTest.class);
+
     protected JChannel                        j, k, l;
     protected static final String             CLUSTER=DeltaViewTest.class.getSimpleName();
     protected static final short              GMS_ID=ClassConfigurator.getProtocolId(GMS.class);

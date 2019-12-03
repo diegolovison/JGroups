@@ -6,6 +6,8 @@ import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.ConfiguratorFactory;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.UUID;
@@ -33,6 +35,8 @@ import java.util.function.Consumer;
  */
 @MBean
 public abstract class Discovery extends Protocol {
+
+    private static final Log log= LogFactory.getLog(Discovery.class);
 
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */

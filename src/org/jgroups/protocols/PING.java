@@ -4,6 +4,8 @@ import org.jgroups.Address;
 import org.jgroups.Event;
 import org.jgroups.Message;
 import org.jgroups.PhysicalAddress;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.NameCache;
 import org.jgroups.util.Responses;
 
@@ -20,6 +22,8 @@ import java.util.List;
  * @author Bela Ban
  */
 public class PING extends Discovery {
+
+    private static final Log log= LogFactory.getLog(PING.class);
 
     public boolean isDynamic() {
         return true;

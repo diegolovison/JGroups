@@ -2,6 +2,8 @@ package org.jgroups.protocols.pbcast;
 
 import org.jgroups.*;
 import org.jgroups.annotations.*;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 
@@ -42,6 +44,8 @@ import java.util.function.Supplier;
  */
 @MBean(description = "Flushes the cluster")
 public class FLUSH extends Protocol {
+
+    private static final Log log= LogFactory.getLog(FLUSH.class);
 
     private static final FlushStartResult SUCCESS_START_FLUSH = new FlushStartResult(Boolean.TRUE,null);
 

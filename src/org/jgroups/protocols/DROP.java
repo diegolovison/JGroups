@@ -2,6 +2,8 @@ package org.jgroups.protocols;
 
 import org.jgroups.Message;
 import org.jgroups.annotations.MBean;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.MessageBatch;
 
@@ -16,6 +18,9 @@ import java.util.function.Predicate;
  */
 @MBean(description="Drops up or down messages according to user-defined filters")
 public class DROP extends Protocol {
+
+    private static final Log log= LogFactory.getLog(DROP.class);
+
     protected final List<Predicate<Message>> down_filters=new ArrayList<>(), up_filters=new ArrayList<>();
 
     public DROP addDownFilter(Predicate<Message> filter) {

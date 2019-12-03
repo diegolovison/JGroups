@@ -7,6 +7,8 @@ import org.jgroups.View;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.*;
 import org.jgroups.util.UUID;
@@ -28,6 +30,9 @@ import java.util.concurrent.ConcurrentMap;
  */
 @MBean(description="Persistent Discovery Cache. Caches discovery information on disk.")
 public class PDC extends Protocol {
+
+    private static final Log log= LogFactory.getLog(PDC.class);
+
     protected final ConcurrentMap<Address,PhysicalAddress> cache=new ConcurrentHashMap<>();
 
     /* -----------------------------------------    Properties     ----------------------------------------------- */

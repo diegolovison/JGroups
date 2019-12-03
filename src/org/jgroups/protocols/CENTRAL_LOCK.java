@@ -5,6 +5,8 @@ import org.jgroups.View;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
 import org.jgroups.blocks.locking.LockNotification;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.util.Owner;
 import org.jgroups.util.Util;
 
@@ -28,6 +30,8 @@ import java.util.*;
  * @see Locking
  */
 public class CENTRAL_LOCK extends Locking implements LockNotification {
+
+    private static final Log log= LogFactory.getLog(CENTRAL_LOCK.class);
 
     @Property(description="Number of backups to the coordinator. Server locks get replicated to these nodes as well")
     protected int                 num_backups=1;

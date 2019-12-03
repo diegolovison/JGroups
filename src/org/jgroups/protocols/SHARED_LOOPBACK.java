@@ -6,6 +6,8 @@ import org.jgroups.PhysicalAddress;
 import org.jgroups.View;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.IpAddress;
 import org.jgroups.util.AsciiString;
 import org.jgroups.util.NameCache;
@@ -23,6 +25,9 @@ import java.util.stream.Collectors;
  * @author Bela Ban
  */
 public class SHARED_LOOPBACK extends TP {
+
+    private static final Log log= LogFactory.getLog(SHARED_LOOPBACK.class);
+
     protected short port=1;
     protected PhysicalAddress physical_addr;
 

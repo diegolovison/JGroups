@@ -5,6 +5,8 @@ import org.jgroups.annotations.Experimental;
 import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.MessageBatch;
 import org.jgroups.util.Util;
@@ -29,6 +31,8 @@ import java.util.function.Supplier;
 @Experimental
 @MBean(description="Protocol just above the transport which disseminates multicasts via daisy chaining")
 public class DAISYCHAIN extends Protocol {
+
+    private static final Log log= LogFactory.getLog(DAISYCHAIN.class);
 
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */

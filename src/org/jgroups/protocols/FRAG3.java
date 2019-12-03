@@ -8,6 +8,8 @@ import org.jgroups.annotations.MBean;
 import org.jgroups.annotations.ManagedAttribute;
 import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
+import org.jgroups.logging.Log;
+import org.jgroups.logging.LogFactory;
 import org.jgroups.stack.Protocol;
 import org.jgroups.util.AverageMinMax;
 import org.jgroups.util.FixedSizeBitSet;
@@ -43,7 +45,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @MBean(description="Fragments messages larger than fragmentation size into smaller packets")
 public class FRAG3 extends Protocol {
-    
+
+    private static final Log log= LogFactory.getLog(FRAG3.class);
 
     /* -----------------------------------------    Properties     -------------------------------------------------- */
     
