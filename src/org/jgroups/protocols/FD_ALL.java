@@ -7,6 +7,9 @@ import org.jgroups.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
@@ -188,14 +191,14 @@ public class FD_ALL extends Protocol {
 
         Header hdr=msg.getHeader(this.id);
         if(hdr != null) {
-            update(sender); // updates the heartbeat entry for 'sender'
+            update(sender, "FD_ALL::up::hdr != null", msg); // updates the heartbeat entry for 'sender'
             num_heartbeats_received++;
             unsuspect(sender);
             return null; // consume heartbeat message, do not pass to the layer above
         }
         else if(msg_counts_as_heartbeat) {
             // message did not originate from FD_ALL layer, but still count as heartbeat
-            update(sender); // update when data is received too ? maybe a bit costly
+            update(sender, "FD_ALL::up::msg_counts_as_heartbeat", msg); // update when data is received too ? maybe a bit costly
             if(has_suspected_mbrs)
                 unsuspect(sender);
         }
@@ -206,7 +209,7 @@ public class FD_ALL extends Protocol {
     public void up(MessageBatch batch) {
         int matching_msgs=batch.replaceIf(HAS_HEADER, null, true);
         if(matching_msgs > 0 || msg_counts_as_heartbeat) {
-            update(batch.sender());
+            update(batch.sender(), "FD_ALL::up::matching_msgs > 0", null);
             num_heartbeats_received++;
             if(has_suspected_mbrs)
                 unsuspect(batch.sender());
@@ -229,7 +232,7 @@ public class FD_ALL extends Protocol {
             case Event.UNSUSPECT:
                 Address mbr=evt.getArg();
                 unsuspect(mbr);
-                update(mbr);
+                update(mbr, "FD_ALL::down::Event.UNSUSPECT", null);
                 break;
         }
         return down_prot.down(evt);
@@ -294,11 +297,27 @@ public class FD_ALL extends Protocol {
         return heartbeat_sender_future != null && !heartbeat_sender_future.isDone();
     }
 
-
-    protected void update(Address sender) {
+    protected void update(Address sender, String logInfo, Message msg) {
         if(sender != null && !sender.equals(local_addr))
             timestamps.put(sender, getTimestamp());
-        if (log.isTraceEnabled()) log.trace("%s: received heartbeat from %s", local_addr, sender);
+        // JDG-3373
+        if (log.isTraceEnabled()) {
+            if (msg != null) {
+                Date dt = null;
+                if (msg.addedToThreadPool != null) {
+                    dt = new Date(msg.addedToThreadPool);
+                }
+                if (dt != null) {
+                    // SimpleDateFormat is not thread-safe
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
+                    log.trace("%s: received heartbeat from %s, method is %s at %s and elapsed %dms", local_addr, sender, logInfo, format.format(dt), System.currentTimeMillis() - dt.getTime());
+                } else {
+                    log.trace("%s: received heartbeat from %s and method is %s not from thread_poll", local_addr, sender, logInfo);
+                }
+            } else {
+                log.trace("%s: received heartbeat from %s and method is %s", local_addr, sender, logInfo);
+            }
+        }
     }
 
     protected void addIfAbsent(Address mbr) {
