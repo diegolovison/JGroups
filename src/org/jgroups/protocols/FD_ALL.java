@@ -14,7 +14,9 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
@@ -302,6 +304,7 @@ public class FD_ALL extends Protocol {
             timestamps.put(sender, getTimestamp());
         // JDG-3373
         if (log.isTraceEnabled()) {
+            int heartbeatHeaderId = getHeartbeatHeaderId(msg);
             if (msg != null) {
                 Date dt = null;
                 if (msg.addedToThreadPool != null) {
@@ -310,14 +313,25 @@ public class FD_ALL extends Protocol {
                 if (dt != null) {
                     // SimpleDateFormat is not thread-safe
                     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
-                    log.trace("%s: received heartbeat from %s, method is %s at %s and elapsed %dms", local_addr, sender, logInfo, format.format(dt), System.currentTimeMillis() - dt.getTime());
+                    log.trace("%s: received heartbeat(%d) from %s, method is %s at %s and elapsed %dms", local_addr, heartbeatHeaderId, sender, logInfo, format.format(dt), System.currentTimeMillis() - dt.getTime());
                 } else {
-                    log.trace("%s: received heartbeat from %s and method is %s not from thread_poll", local_addr, sender, logInfo);
+                    log.trace("%s: received heartbeat(%d) from %s and method is %s not from thread_poll", local_addr, heartbeatHeaderId, sender, logInfo);
                 }
             } else {
-                log.trace("%s: received heartbeat from %s and method is %s", local_addr, sender, logInfo);
+                log.trace("%s: received heartbeat(%d) from %s and method is %s", local_addr, heartbeatHeaderId, sender, logInfo);
             }
         }
+    }
+
+    private int getHeartbeatHeaderId(Message msg) {
+        int id = 0;
+        if (msg != null) {
+            if (msg.getHeaders() != null) {
+                HeartbeatHeader header = msg.getHeader(this.id);
+                id = header.getUuid();
+            }
+        }
+        return id;
     }
 
     protected void addIfAbsent(Address mbr) {
@@ -415,8 +429,11 @@ public class FD_ALL extends Protocol {
 
 
     public static class HeartbeatHeader extends Header {
-        public HeartbeatHeader() {}
-        public String toString() {return "heartbeat";}
+        private int uuid;
+        public HeartbeatHeader() {
+            this.uuid = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
+        }
+        public String toString() {return "heartbeat("+uuid+")";}
         public short getMagicId() {return 62;}
         public Supplier<? extends Header> create() {return HeartbeatHeader::new;}
         @Override
@@ -425,16 +442,20 @@ public class FD_ALL extends Protocol {
         public void writeTo(DataOutput out) {}
         @Override
         public void readFrom(DataInput in) {}
+        public int getUuid() {
+            return this.uuid;
+        }
     }
 
 
     /** Class which periodically multicasts a HEARTBEAT message to the cluster */
     class HeartbeatSender implements Runnable {
         public void run() {
-            Message heartbeat=new Message().setFlag(Message.Flag.INTERNAL).putHeader(id, new HeartbeatHeader());
+            HeartbeatHeader heartbeatHeader = new HeartbeatHeader();
+            Message heartbeat=new Message().setFlag(Message.Flag.INTERNAL).putHeader(id, heartbeatHeader);
             down_prot.down(heartbeat);
             num_heartbeats_sent++;
-            log.trace("%s: sent heartbeat", local_addr);
+            log.trace("%s: sent heartbeat(%d)", local_addr, heartbeatHeader.getUuid());
         }
 
         public String toString() {
