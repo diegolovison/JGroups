@@ -1472,10 +1472,20 @@ public abstract class TP extends Protocol implements DiagnosticsHandler.ProbeHan
             msg_stats.incrNumMsgsSent(1);
             msg_stats.incrNumBytesSent(length);
         }
+        long traceBeginTime = 0;
+        if (is_trace) {
+            traceBeginTime = System.currentTimeMillis();
+        }
         if(dest == null)
             sendMulticast(buf, offset, length);
         else
             sendToSingleMember(dest, buf, offset, length);
+        if (is_trace) {
+            long duration = System.currentTimeMillis() - traceBeginTime;
+            if (duration > 0) {
+                log.trace("%s: network call took %dms", local_addr, duration);
+            }
+        }
     }
 
 
