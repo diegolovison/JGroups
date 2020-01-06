@@ -41,7 +41,8 @@ public class TpHeader extends Header {
     public short getMagicId() {return 60;}
 
     public String toString() {
-        return String.format("[cluster=%s]", new String(cluster_name));
+        // TODO create a JIRA and provide a fix
+        return String.format("[cluster=%s]", cluster_name != null ? new String(cluster_name) : "null");
     }
 
     public byte[] getClusterName() {return cluster_name;}

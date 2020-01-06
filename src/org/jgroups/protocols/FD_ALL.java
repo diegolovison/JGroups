@@ -7,16 +7,14 @@ import org.jgroups.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
@@ -431,17 +429,24 @@ public class FD_ALL extends Protocol {
     public static class HeartbeatHeader extends Header {
         private int uuid;
         public HeartbeatHeader() {
-            this.uuid = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
+
+        }
+        public HeartbeatHeader(int uuid) {
+            this.uuid = uuid;
         }
         public String toString() {return "heartbeat("+uuid+")";}
         public short getMagicId() {return 62;}
-        public Supplier<? extends Header> create() {return HeartbeatHeader::new;}
+        public Supplier<? extends Header> create() { return HeartbeatHeader::new; }
         @Override
         public int serializedSize() {return 0;}
         @Override
-        public void writeTo(DataOutput out) {}
+        public void writeTo(DataOutput out) throws IOException {
+            Bits.writeInt(uuid,out);
+        }
         @Override
-        public void readFrom(DataInput in) {}
+        public void readFrom(DataInput in) throws IOException {
+            this.uuid=Bits.readInt(in);
+        }
         public int getUuid() {
             return this.uuid;
         }
@@ -451,7 +456,7 @@ public class FD_ALL extends Protocol {
     /** Class which periodically multicasts a HEARTBEAT message to the cluster */
     class HeartbeatSender implements Runnable {
         public void run() {
-            HeartbeatHeader heartbeatHeader = new HeartbeatHeader();
+            HeartbeatHeader heartbeatHeader = new HeartbeatHeader(ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
             Message heartbeat=new Message().setFlag(Message.Flag.INTERNAL).putHeader(id, heartbeatHeader);
             down_prot.down(heartbeat);
             num_heartbeats_sent++;
