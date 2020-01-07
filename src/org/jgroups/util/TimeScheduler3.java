@@ -259,6 +259,7 @@ public class TimeScheduler3 implements TimeScheduler, Runnable {
     protected Task add(Task task) {
         //  if(!isRunning())
         //    return null;
+        task.addToQueueTime = System.currentTimeMillis();
         queue.add(task);
         removeCancelledTasks();
         return task;
@@ -272,6 +273,7 @@ public class TimeScheduler3 implements TimeScheduler, Runnable {
 
 
     public static class Task implements Runnable, Delayed, Future {
+        protected long             addToQueueTime;
         protected final Runnable   runnable;      // the task to execute
         protected long             creation_time; // time (in ns) at which the task was created
         protected long             delay;         // time (in ns) after which the task should execute
@@ -332,6 +334,13 @@ public class TimeScheduler3 implements TimeScheduler, Runnable {
             }
             finally {
                 done=true;
+                if (log.isTraceEnabled()) {
+                    if (this.runnable.toString().contains("FD_ALL: HeartbeatSender")) {
+                        long elapsedQueueTime = System.currentTimeMillis() - this.addToQueueTime;
+                        String toString = this.runnable.getClass().getName() + "@" + Integer.toHexString(this.runnable.hashCode());
+                        log.trace(String.format("%s -> elapsed queue %dms", toString, elapsedQueueTime));
+                    }
+                }
             }
         }
 
