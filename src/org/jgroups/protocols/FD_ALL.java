@@ -7,10 +7,13 @@ import org.jgroups.util.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -188,14 +191,14 @@ public class FD_ALL extends Protocol {
 
         Header hdr=msg.getHeader(this.id);
         if(hdr != null) {
-            update(sender); // updates the heartbeat entry for 'sender'
+            update(sender, "FD_ALL::up::hdr != null", msg); // updates the heartbeat entry for 'sender'
             num_heartbeats_received++;
             unsuspect(sender);
             return null; // consume heartbeat message, do not pass to the layer above
         }
         else if(msg_counts_as_heartbeat) {
             // message did not originate from FD_ALL layer, but still count as heartbeat
-            update(sender); // update when data is received too ? maybe a bit costly
+            update(sender, "FD_ALL::up::msg_counts_as_heartbeat", msg); // update when data is received too ? maybe a bit costly
             if(has_suspected_mbrs)
                 unsuspect(sender);
         }
@@ -206,7 +209,7 @@ public class FD_ALL extends Protocol {
     public void up(MessageBatch batch) {
         int matching_msgs=batch.replaceIf(HAS_HEADER, null, true);
         if(matching_msgs > 0 || msg_counts_as_heartbeat) {
-            update(batch.sender());
+            update(batch.sender(), "FD_ALL::up::matching_msgs > 0", null);
             num_heartbeats_received++;
             if(has_suspected_mbrs)
                 unsuspect(batch.sender());
@@ -229,7 +232,7 @@ public class FD_ALL extends Protocol {
             case Event.UNSUSPECT:
                 Address mbr=evt.getArg();
                 unsuspect(mbr);
-                update(mbr);
+                update(mbr, "FD_ALL::down::Event.UNSUSPECT", null);
                 break;
         }
         return down_prot.down(evt);
@@ -294,11 +297,39 @@ public class FD_ALL extends Protocol {
         return heartbeat_sender_future != null && !heartbeat_sender_future.isDone();
     }
 
-
-    protected void update(Address sender) {
+    protected void update(Address sender, String logInfo, Message msg) {
         if(sender != null && !sender.equals(local_addr))
             timestamps.put(sender, getTimestamp());
-        if (log.isTraceEnabled()) log.trace("%s: received heartbeat from %s", local_addr, sender);
+        // JDG-3373
+        if (log.isTraceEnabled()) {
+            int heartbeatHeaderId = getHeartbeatHeaderId(msg);
+            if (msg != null) {
+                Date dt = null;
+                if (msg.addedToThreadPool != null) {
+                    dt = new Date(msg.addedToThreadPool);
+                }
+                if (dt != null) {
+                    // SimpleDateFormat is not thread-safe
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
+                    log.trace("%s: received heartbeat(%d) from %s, method is %s at %s and elapsed %dms", local_addr, heartbeatHeaderId, sender, logInfo, format.format(dt), System.currentTimeMillis() - dt.getTime());
+                } else {
+                    log.trace("%s: received heartbeat(%d) from %s and method is %s not from thread_poll", local_addr, heartbeatHeaderId, sender, logInfo);
+                }
+            } else {
+                log.trace("%s: received heartbeat(%d) from %s and method is %s", local_addr, heartbeatHeaderId, sender, logInfo);
+            }
+        }
+    }
+
+    private int getHeartbeatHeaderId(Message msg) {
+        int id = 0;
+        if (msg != null) {
+            if (msg.getHeaders() != null) {
+                HeartbeatHeader header = msg.getHeader(this.id);
+                id = header.getUuid();
+            }
+        }
+        return id;
     }
 
     protected void addIfAbsent(Address mbr) {
@@ -396,26 +427,42 @@ public class FD_ALL extends Protocol {
 
 
     public static class HeartbeatHeader extends Header {
-        public HeartbeatHeader() {}
-        public String toString() {return "heartbeat";}
+        private int uuid;
+        public HeartbeatHeader() {
+
+        }
+        public HeartbeatHeader(int uuid) {
+            this.uuid = uuid;
+        }
+        public String toString() {return "heartbeat("+uuid+")";}
         public short getMagicId() {return 62;}
-        public Supplier<? extends Header> create() {return HeartbeatHeader::new;}
+        public Supplier<? extends Header> create() { return HeartbeatHeader::new; }
         @Override
-        public int serializedSize() {return 0;}
+        public int serializedSize() {
+            return Bits.size(uuid);
+        }
         @Override
-        public void writeTo(DataOutput out) {}
+        public void writeTo(DataOutput out) throws IOException {
+            Bits.writeInt(uuid,out);
+        }
         @Override
-        public void readFrom(DataInput in) {}
+        public void readFrom(DataInput in) throws IOException {
+            this.uuid=Bits.readInt(in);
+        }
+        public int getUuid() {
+            return this.uuid;
+        }
     }
 
 
     /** Class which periodically multicasts a HEARTBEAT message to the cluster */
     class HeartbeatSender implements Runnable {
         public void run() {
-            Message heartbeat=new Message().setFlag(Message.Flag.INTERNAL).putHeader(id, new HeartbeatHeader());
+            HeartbeatHeader heartbeatHeader = new HeartbeatHeader(ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+            Message heartbeat=new Message().setFlag(Message.Flag.INTERNAL).putHeader(id, heartbeatHeader);
             down_prot.down(heartbeat);
             num_heartbeats_sent++;
-            log.trace("%s: sent heartbeat", local_addr);
+            log.trace("%s: sent heartbeat(%d)", local_addr, heartbeatHeader.getUuid());
         }
 
         public String toString() {

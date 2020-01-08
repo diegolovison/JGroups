@@ -48,6 +48,7 @@ public class Message implements Streamable, Constructable<Message> {
     static final byte           SRC_SET          =  1 << 1;
     static final byte           BUF_SET          =  1 << 2;
 
+    public Long addedToThreadPool;
 
     // =============================== Flags ====================================
     public enum Flag {
