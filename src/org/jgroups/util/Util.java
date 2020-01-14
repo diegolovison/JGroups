@@ -1266,6 +1266,11 @@ public class Util {
 
     public static void parse(InputStream input, BiConsumer<Short,Message> msg_consumer,
                              BiConsumer<Short,MessageBatch> batch_consumer, boolean tcp) {
+        parse(input, msg_consumer, batch_consumer, tcp, false);
+    }
+
+    public static void parse(InputStream input, BiConsumer<Short,Message> msg_consumer,
+                             BiConsumer<Short,MessageBatch> batch_consumer, boolean tcp, boolean throws_) {
         if(msg_consumer == null && batch_consumer == null)
             return;
         byte[] tmp=new byte[Global.INT_SIZE];
@@ -1314,7 +1319,11 @@ public class Util {
         catch(EOFException ignored) {
         }
         catch(Throwable t) {
-            t.printStackTrace();
+            if (throws_) {
+                throw new IllegalStateException(t);
+            } else {
+                t.printStackTrace();
+            }
         }
     }
 

@@ -77,52 +77,11 @@ public class ParseMessages {
 
         final boolean print_version=print_vers, parse=parse_discovery_responses;
         final AtomicInteger cnt=new AtomicInteger(1);
-        BiConsumer<Short,Message> msg_consumer=(version,msg) -> {
-            if(parse) {
-                try {
-                    parseDiscoveryResponse(msg);
-                }
-                catch(Exception e) {
-                    System.err.printf("failed parsing discovery response from %s: %s\n", msg.src(), e);
-                }
-            }
-            View view=show_views? getView(msg) : null;
-            System.out.printf("%d:%s %s, hdrs: %s %s\n", cnt.getAndIncrement(),
-                              print_version? String.format(" [%s]", Version.print(version)) : "", msg, msg.printHeaders(),
-                              view == null? "" : "(view: " + view + ")");
-        };
 
-        BiConsumer<Short,MessageBatch> batch_consumer=(version,batch) -> {
-            System.out.printf("%d:%s batch to %s from %s (%d messages):\n",
-                              cnt.getAndIncrement(),
-                              print_version? String.format(" [%s]", Version.print(version)) : "",
-                              batch.dest() != null? batch.dest() : "<all>", batch.sender(),
-                              batch.size());
-            int index=1;
-            for(Message msg: batch) {
-                if(parse) {
-                    try {
-                        parseDiscoveryResponse(msg);
-                    }
-                    catch(Exception e) {
-                        System.err.printf("failed parsing discovery response from %s: %s\n", msg.src(), e);
-                    }
-                }
-                View view=show_views? getView(msg) : null;
-                System.out.printf("%d:%s %s, hdrs: %s %s\n", cnt.getAndIncrement(),
-                                  print_version? String.format(" [%s]", Version.print(version)) : "", msg, msg.printHeaders(),
-                                  view == null? "" : "(view: " + view + ")");
-                System.out.printf("    %d: [%d bytes%s], hdrs: %s %s\n",
-                                  index++, msg.getLength(),
-                                  msg.getFlags() > 0? ", flags=" + Message.flagsToString(msg.getFlags()) : "",
-                                  msg.printHeaders(),
-                                  view == null? "" : "(view: " + view + ")");
-            }
-        };
         InputStream in=file != null? new FileInputStream(file) : System.in;
         if(binary_to_ascii)
             in=new BinaryToAsciiInputStream(in);
-        parse(in, msg_consumer, batch_consumer, tcp);
+        parse(in, new MessageConsumer(parse, print_version, cnt), new BatchConsumer(parse, print_version, cnt), tcp);
     }
 
     protected static void parseDiscoveryResponse(Message msg) throws IOException, ClassNotFoundException {
@@ -194,7 +153,7 @@ public class ParseMessages {
         }
     }
 
-    protected static class BinaryToAsciiInputStream extends InputStream {
+    public static class BinaryToAsciiInputStream extends InputStream {
         protected final InputStream in;
         protected final byte[]      input=new byte[2];
 
@@ -218,5 +177,87 @@ public class ParseMessages {
             return (char)val;
         }
 
+    }
+
+    public static class MessageConsumer extends BaseConsumer implements BiConsumer<Short,Message> {
+
+        private final boolean parse;
+        private final boolean print_version;
+        private final AtomicInteger cnt;
+
+        public MessageConsumer(boolean parse, boolean print_version, AtomicInteger cnt) {
+            this.parse = parse;
+            this.print_version = print_version;
+            this.cnt = cnt;
+        }
+
+        @Override
+        public void accept(Short version, Message msg) {
+            if(parse) {
+                try {
+                    parseDiscoveryResponse(msg);
+                }
+                catch(Exception e) {
+                    System.err.printf("failed parsing discovery response from %s: %s\n", msg.src(), e);
+                }
+            }
+            View view=show_views? getView(msg) : null;
+            print(String.format("%d:%s %s, hdrs: %s %s\n", cnt.getAndIncrement(),
+                  print_version? String.format(" [%s]", Version.print(version)) : "", msg, msg.printHeaders(),
+                  view == null? "" : "(view: " + view + ")"));
+         }
+    }
+
+    public static class BatchConsumer extends BaseConsumer implements BiConsumer<Short,MessageBatch> {
+
+        private final boolean parse;
+        private final boolean print_version;
+        private final AtomicInteger cnt;
+
+        public BatchConsumer(boolean parse, boolean print_version, AtomicInteger cnt) {
+            this.parse = parse;
+            this.print_version = print_version;
+            this.cnt = cnt;
+        }
+
+        @Override
+        public void accept(Short version, MessageBatch batch) {
+            print(String.format("%d:%s batch to %s from %s (%d messages):\n",
+                  cnt.getAndIncrement(),
+                  print_version? String.format(" [%s]", Version.print(version)) : "",
+                  batch.dest() != null? batch.dest() : "<all>", batch.sender(),
+                  batch.size()));
+            int index=1;
+            for(Message msg: batch) {
+                if(parse) {
+                    try {
+                        parseDiscoveryResponse(msg);
+                    }
+                    catch(Exception e) {
+                        printErr(String.format("failed parsing discovery response from %s: %s\n", msg.src(), e));
+                    }
+                }
+                View view=show_views? getView(msg) : null;
+                print(String.format("%d:%s %s, hdrs: %s %s\n", cnt.getAndIncrement(),
+                      print_version? String.format(" [%s]", Version.print(version)) : "", msg, msg.printHeaders(),
+                      view == null? "" : "(view: " + view + ")"));
+                print(String.format("    %d: [%d bytes%s], hdrs: %s %s\n",
+                      index++, msg.getLength(),
+                      msg.getFlags() > 0? ", flags=" + Message.flagsToString(msg.getFlags()) : "",
+                      msg.printHeaders(),
+                      view == null? "" : "(view: " + view + ")"));
+            }
+        }
+    }
+
+    public static class BaseConsumer {
+
+        public void print(String message) {
+            System.out.printf(message);
+        }
+
+        public void printErr(String message) {
+            System.err.printf(message);
+        }
     }
 }
