@@ -201,11 +201,15 @@ public class ParseMessages {
                     System.err.printf("failed parsing discovery response from %s: %s\n", msg.src(), e);
                 }
             }
+            acceptMessage(msg, version);
+         }
+
+        protected void acceptMessage(Message msg, Short version) {
             View view=show_views? getView(msg) : null;
             print(String.format("%d:%s %s, hdrs: %s %s\n", cnt.getAndIncrement(),
                   print_version? String.format(" [%s]", Version.print(version)) : "", msg, msg.printHeaders(),
                   view == null? "" : "(view: " + view + ")"));
-         }
+        }
     }
 
     public static class BatchConsumer extends BaseConsumer implements BiConsumer<Short,MessageBatch> {
@@ -237,16 +241,20 @@ public class ParseMessages {
                         printErr(String.format("failed parsing discovery response from %s: %s\n", msg.src(), e));
                     }
                 }
-                View view=show_views? getView(msg) : null;
-                print(String.format("%d:%s %s, hdrs: %s %s\n", cnt.getAndIncrement(),
-                      print_version? String.format(" [%s]", Version.print(version)) : "", msg, msg.printHeaders(),
-                      view == null? "" : "(view: " + view + ")"));
-                print(String.format("    %d: [%d bytes%s], hdrs: %s %s\n",
-                      index++, msg.getLength(),
-                      msg.getFlags() > 0? ", flags=" + Message.flagsToString(msg.getFlags()) : "",
-                      msg.printHeaders(),
-                      view == null? "" : "(view: " + view + ")"));
+                acceptMessage(msg, index++, version);
             }
+        }
+
+        protected void acceptMessage(Message msg, int index, Short version) {
+            View view=show_views? getView(msg) : null;
+            print(String.format("%d:%s %s, hdrs: %s %s\n", cnt.getAndIncrement(),
+                  print_version? String.format(" [%s]", Version.print(version)) : "", msg, msg.printHeaders(),
+                  view == null? "" : "(view: " + view + ")"));
+            print(String.format("    %d: [%d bytes%s], hdrs: %s %s\n",
+                  index, msg.getLength(),
+                  msg.getFlags() > 0? ", flags=" + Message.flagsToString(msg.getFlags()) : "",
+                  msg.printHeaders(),
+                  view == null? "" : "(view: " + view + ")"));
         }
     }
 
