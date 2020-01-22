@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jgroups.Header;
 import org.jgroups.Message;
 import org.jgroups.protocols.FD_ALL;
+import org.jgroups.protocols.PingHeader;
 import org.jgroups.tests.ParseMessages;
 
 public class ClusterFailureDetectionUtil {
@@ -91,6 +92,17 @@ public class ClusterFailureDetectionUtil {
       class EpochMessage {
          Message message;
          ZonedDateTime zonedDateTime;
+
+         @Override
+         public String toString() {
+            StringBuilder sb = new StringBuilder();
+            if (message.getHeaders() != null) {
+
+            }
+            return "EpochMessage{" +
+                  "message=" + message +
+                  '}';
+         }
       }
 
       List<EpochMessage> all = new ArrayList<>();
@@ -135,7 +147,7 @@ public class ClusterFailureDetectionUtil {
                         try {
                            Util.parse(new ParseMessages.BinaryToAsciiInputStream(result), messageConsumer, batchConsumer, false, true);
                         } catch (Exception e) {
-
+                           System.out.println(line + " -> " + e.getMessage());
                         }
                      }
                   } else if (FIELD_TIME_EPOCH.equals(tSharkField)){
@@ -185,6 +197,8 @@ public class ClusterFailureDetectionUtil {
                data.uuid = uuid;
                data.epochTime = m.zonedDateTime;
                heartbeatHeaderDataList.add(data);
+            } else if (header instanceof PingHeader) {
+               System.out.println(header);
             }
 
          }
