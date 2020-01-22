@@ -35,7 +35,7 @@ public class NoBundler implements Bundler {
         Address dest=msg.getDest();
         output.position(0);
         Util.writeMessage(msg, output, dest == null);
-        transport.doSend(output.buffer(), 0, output.position(), dest);
+        transport.doSend(output.buffer(), 0, output.position(), dest, msg.addedToThreadPool);
         if(transport.statsEnabled())
             transport.incrNumSingleMsgsSent(1);
     }

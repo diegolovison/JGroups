@@ -79,15 +79,19 @@ public class SimplifiedTransferQueueBundler extends TransferQueueBundler {
                 }
                 else {
                     Util.writeMessageListHeader(dest, msg_queue[start].getSrc(), transport.cluster_name.chars(), numMsgs, output, dest == null);
+                    Long addedToThreadPool = null;
                     for(int i=start; i < MSG_BUF_SIZE; ++i) {
                         Message msg=msg_queue[i];
+                        if (addedToThreadPool == null) {
+                            addedToThreadPool = msg.addedToThreadPool;
+                        }
                         // since we assigned the matching destination we can do plain ==
                         if(msg != null && msg.getDest() == dest) {
                             msg.writeToNoAddrs(msg.getSrc(), output, transport.getId());
                             msg_queue[i]=null;
                         }
                     }
-                    transport.doSend(output.buffer(), 0, output.position(), dest);
+                    transport.doSend(output.buffer(), 0, output.position(), dest, addedToThreadPool);
                 }
                 start++;
             }

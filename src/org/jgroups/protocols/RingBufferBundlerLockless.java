@@ -182,7 +182,7 @@ public class RingBufferBundlerLockless extends BaseBundler {
                     output.writeInt(num_msgs);
                     output.position(current_pos);
                 }
-                transport.doSend(output.buffer(), 0, output.position(), dest);
+                transport.doSend(output.buffer(), 0, output.position(), dest, msg.addedToThreadPool);
                 if(transport.statsEnabled())
                     transport.incrBatchesSent(num_msgs);
             }

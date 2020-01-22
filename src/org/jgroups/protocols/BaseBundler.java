@@ -86,7 +86,7 @@ public abstract class BaseBundler implements Bundler {
         Address dest=msg.getDest();
         try {
             Util.writeMessage(msg, output, dest == null);
-            transport.doSend(output.buffer(), 0, output.position(), dest);
+            transport.doSend(output.buffer(), 0, output.position(), dest, msg.addedToThreadPool);
             if(transport.statsEnabled())
                 transport.incrNumSingleMsgsSent(1);
         }
@@ -101,7 +101,7 @@ public abstract class BaseBundler implements Bundler {
     protected void sendMessageList(final Address dest, final Address src, final List<Message> list) {
         try {
             Util.writeMessageList(dest, src, transport.cluster_name.chars(), list, output, dest == null, transport.getId());
-            transport.doSend(output.buffer(), 0, output.position(), dest);
+            transport.doSend(output.buffer(), 0, output.position(), dest, list.get(0).addedToThreadPool);
         }
         catch(Throwable e) {
             log.trace(Util.getMessage("FailureSendingMsgBundle"), transport.localAddress(), e);
