@@ -1,15 +1,19 @@
-package org.jgroups.util;
+package org.jgroups.tests;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,15 +21,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.border.MatteBorder;
 
 import org.jgroups.Header;
 import org.jgroups.Message;
 import org.jgroups.protocols.FD_ALL;
 import org.jgroups.protocols.PingHeader;
-import org.jgroups.tests.ParseMessages;
+import org.jgroups.util.Util;
 
 public class ClusterFailureDetectionUtil {
+
+   private static final DateTimeFormatter TIME_EPOCH_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS");
+
+   private static final int diffHours = 3;
 
    // tshark support fields
    private static final String FIELD_DATA = "data";
@@ -57,14 +70,59 @@ public class ClusterFailureDetectionUtil {
       }
 
       ClusterFailureDetectionUtil fooBarDetection = new ClusterFailureDetectionUtil();
-      fooBarDetection.printTShark(file, tSharkFields, zoneId);
-      if (jgroupsLogFolder != null) {
-         fooBarDetection.foo(jgroupsLogFolder);
+
+      List<File> serverLogs = fooBarDetection.getServerLogs(jgroupsLogFolder);
+      Map<String, String> mappings = fooBarDetection.getMapping(serverLogs);
+      Map<String, List<HeartbeatHeaderData>> tsharkDump = fooBarDetection.get_FD_ALL_TShark(file, tSharkFields, zoneId, mappings);
+      Map<String, List<HeartbeatHeaderData>> jgroupsLogsDump = fooBarDetection.read_FD_ALL_fromJGroupsLog(serverLogs, zoneId);
+
+      class Diff {
+         LocalTime tsharkTime;
+         LocalTime jgroupsTime;
+         long diffMs;
+         String sender;
+         int uuid;
       }
+
+      Map<String, List<Diff>> diffMap = new HashMap<>();
+
+      // tshark can start later and has less values when compared with logs
+      for (String sender : tsharkDump.keySet()) {
+         List<HeartbeatHeaderData> tsharkDataList = tsharkDump.get(sender);
+         List<HeartbeatHeaderData> logDataList = jgroupsLogsDump.get(sender);
+
+         for (HeartbeatHeaderData tsharkData : tsharkDataList) {
+
+            int logDataIndex = logDataList.indexOf(tsharkData);
+            HeartbeatHeaderData logData = logDataList.get(logDataIndex);
+
+            long tsharkTime = tsharkData.epochTime.toInstant().toEpochMilli();
+            long jGroupsTime = logData.epochTime.toInstant().toEpochMilli();
+            long diffMs = Math.abs(tsharkTime - jGroupsTime);
+
+            if (diffMs > 1_000) {
+               Diff d = new Diff();
+               d.tsharkTime = tsharkData.epochTime.toLocalTime().minusHours(diffHours);
+               d.jgroupsTime = logData.epochTime.toLocalTime().minusHours(diffHours);
+               d.diffMs = diffMs;
+               d.sender = sender;
+               d.uuid = tsharkData.uuid;
+
+               List<Diff> diffs = diffMap.get(sender);
+               if (diffs == null) {
+                  diffs = new ArrayList<>();
+                  diffMap.put(sender, diffs);
+               }
+               diffs.add(d);
+            }
+         }
+      }
+
+      System.out.println(diffMap);
    }
 
-   public void foo(String jgroupsLogFolder) throws IOException {
-
+   public List<File> getServerLogs(String jgroupsLogFolder) {
+      List<File> serverLogs = new ArrayList<>();
       String fileNameRegex = "server-\\d.log";
 
       File folder = new File(jgroupsLogFolder);
@@ -73,17 +131,80 @@ public class ClusterFailureDetectionUtil {
       for (String fileName : files) {
          if (fileName.matches(fileNameRegex)) {
             File logFile = new File(jgroupsLogFolder, fileName);
-            Files.readAllLines(Paths.get(logFile.getAbsolutePath())).stream().forEach(line -> {
-               if (line.contains("sent heartbeat")) {
-                  System.out.println(line);
-               }
-            });
+            serverLogs.add(logFile);
          }
       }
+      return serverLogs;
    }
 
-   public void printTShark(String file, String[] tSharkFields, ZoneId zoneId) {
+   public Map<String, String> getMapping(List<File> serverLogs) throws IOException {
+      Pattern pattern = Pattern.compile("(.*)local_addr: (.*), name: (.*)");
+      Map<String, String> mapping = new HashMap<>();
+      for (File logFile : serverLogs) {
+         BufferedReader buffReader = new BufferedReader(new InputStreamReader(new FileInputStream(logFile)));
+         String line = buffReader.readLine();
+         while (line != null) {
+            if (line.contains("TRACE")) {
+               Matcher matcher = pattern.matcher(line);
+               if (matcher.find()) {
+                  String uuid = matcher.group(2);
+                  String name = matcher.group(3);
+                  mapping.put(uuid, name);
+                  break;
+               }
+            }
+            line = buffReader.readLine();
+         }
+      }
+      if (serverLogs.size() != mapping.size()) {
+         throw new IllegalStateException("Mapping must match");
+      }
+      return mapping;
+   }
 
+   public Map<String, List<HeartbeatHeaderData>> read_FD_ALL_fromJGroupsLog(List<File> serverLogs, ZoneId zoneId) throws IOException {
+      Map<String, List<HeartbeatHeaderData>> map = new HashMap<>();
+      Pattern patternFD_ALL = Pattern.compile("\\[FD_ALL\\] (.*): sent heartbeat\\((.*)\\)");
+      Pattern patternEpoch = Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}");
+
+      for (File logFile : serverLogs) {
+         Files.readAllLines(Paths.get(logFile.getAbsolutePath())).stream().forEach(line -> {
+            if (line.contains("sent heartbeat")) {
+               Matcher matcherFD_ALL = patternFD_ALL.matcher(line);
+               if (matcherFD_ALL.find()) {
+
+                  // data
+                  String sender = matcherFD_ALL.group(1);
+                  int uuid = Integer.valueOf(matcherFD_ALL.group(2));
+                  List<HeartbeatHeaderData> list = map.get(sender);
+                  if (list == null) {
+                     list = new ArrayList<>();
+                     map.put(sender, list);
+                  }
+
+                  // epoch
+                  ZonedDateTime epochTime;
+                  Matcher matcherEpoch = patternEpoch.matcher(line);
+                  if (matcherEpoch.find()) {
+                     String date = matcherEpoch.group();
+                     LocalDateTime localDateTime = LocalDateTime.parse(date, TIME_EPOCH_DATE_TIME_FORMATTER).plusHours(diffHours);
+                     epochTime = ZonedDateTime.of(localDateTime, zoneId);
+                  } else {
+                     throw new IllegalStateException("It must have the date");
+                  }
+
+                  HeartbeatHeaderData data = new HeartbeatHeaderData();
+                  data.uuid = uuid;
+                  data.epochTime = epochTime;
+                  list.add(data);
+               }
+            }
+         });
+      }
+      return map;
+   }
+
+   public Map<String, List<HeartbeatHeaderData>> get_FD_ALL_TShark(String file, String[] tSharkFields, ZoneId zoneId, Map<String, String> mappings) {
 
       boolean parse = true;
       boolean print_version = true;
@@ -172,11 +293,6 @@ public class ClusterFailureDetectionUtil {
          e.printStackTrace();
       }
 
-      class HeartbeatHeaderData {
-         int uuid;
-         ZonedDateTime epochTime;
-      }
-
       Map<String, List<HeartbeatHeaderData>> map = new HashMap<>();
 
       for (EpochMessage m : all) {
@@ -185,7 +301,7 @@ public class ClusterFailureDetectionUtil {
             Header header = headers.get(key);
             if (header instanceof FD_ALL.HeartbeatHeader) {
                FD_ALL.HeartbeatHeader fdAllHeader = (FD_ALL.HeartbeatHeader) header;
-               String sender = m.message.getSrc().toString();
+               String sender = mappings.get(m.message.getSrc().toString());
                int uuid = fdAllHeader.getUuid();
                List<HeartbeatHeaderData> heartbeatHeaderDataList = map.get(sender);
                if (heartbeatHeaderDataList == null) {
@@ -197,26 +313,28 @@ public class ClusterFailureDetectionUtil {
                data.uuid = uuid;
                data.epochTime = m.zonedDateTime;
                heartbeatHeaderDataList.add(data);
-            } else if (header instanceof PingHeader) {
-               System.out.println(header);
             }
 
          }
       }
+      return map;
+   }
 
-      long maxDiff = 10;
-      for (String host : map.keySet()) {
-         List<HeartbeatHeaderData> hostHeartBeatList = map.get(host);
-         long last = 0;
-         for (HeartbeatHeaderData headerData : hostHeartBeatList) {
-            long current = headerData.epochTime.toEpochSecond();
-            if (last > 0) {
-               if (current - last > maxDiff) {
-                  System.out.println(String.format("sender: %s, uuid: %d", host, headerData.uuid));
-               }
-            }
-            last = headerData.epochTime.toEpochSecond();
-         }
+   private static class HeartbeatHeaderData {
+      int uuid;
+      ZonedDateTime epochTime;
+
+      @Override
+      public boolean equals(Object o) {
+         if (this == o) return true;
+         if (o == null || getClass() != o.getClass()) return false;
+         HeartbeatHeaderData that = (HeartbeatHeaderData) o;
+         return uuid == that.uuid;
+      }
+
+      @Override
+      public int hashCode() {
+         return Objects.hash(uuid);
       }
    }
 }
