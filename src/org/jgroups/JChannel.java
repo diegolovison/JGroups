@@ -998,10 +998,11 @@ public class JChannel implements Closeable {
         if(name == null || name.isEmpty()) // generate a logical name if not set
             name=Util.generateLocalName();
         if(name != null && !name.isEmpty()) {
-            NameCache.add(local_addr, name);
+            // local_addr.toString() will change once added in the NameCache
             if (log.isTraceEnabled()) {
                 log.trace("local_addr: %s, name: %s", local_addr, name);
             }
+            NameCache.add(local_addr, name);
         }
 
         Event evt=new Event(Event.SET_LOCAL_ADDRESS, local_addr);
