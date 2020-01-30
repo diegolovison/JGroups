@@ -45,14 +45,13 @@ public class ClusterFailureDetectionUtil {
    private static final String FIELD_TIME_EPOCH = "frame.time_epoch";
 
    public static void main(String[] args) throws IOException {
-      String file=null;
+      String logFolder=null;
       String[] tSharkFields=new String[] {"data"};
       ZoneId zoneId=ZoneId.systemDefault();
-      String jgroupsLogFolder=null;
 
       for(int i=0; i < args.length; i++) {
-         if (args[i].equals("-file")) {
-            file = args[++i];
+         if (args[i].equals("-logFolder")) {
+            logFolder = args[++i];
             continue;
          }
          if("-tshark-fields".equalsIgnoreCase(args[i])) {
@@ -63,17 +62,14 @@ public class ClusterFailureDetectionUtil {
             zoneId=ZoneId.of(args[++i]);
             continue;
          }
-         if ("-jgroupsLogFolder".equals(args[i])) {
-            jgroupsLogFolder=args[++i];
-            continue;
-         }
       }
 
       ClusterFailureDetectionUtil fooBarDetection = new ClusterFailureDetectionUtil();
 
-      List<File> serverLogs = fooBarDetection.getServerLogs(jgroupsLogFolder);
+      List<File> serverLogs = fooBarDetection.getServerLogs(logFolder);
+      List<File> tsharkLogs = fooBarDetection.getTsharkLogs(logFolder);
       Map<String, String> mappings = fooBarDetection.getMapping(serverLogs);
-      Map<String, List<HeartbeatHeaderData>> tsharkDump = fooBarDetection.get_FD_ALL_TShark(file, tSharkFields, zoneId, mappings);
+      Map<String, List<HeartbeatHeaderData>> tsharkDump = fooBarDetection.get_FD_ALL_TShark(tsharkLogs, tSharkFields, zoneId, mappings);
       Map<String, List<HeartbeatHeaderData>> jgroupsLogsDump = fooBarDetection.read_FD_ALL_fromJGroupsLog(serverLogs, zoneId);
 
       class Diff {
@@ -121,16 +117,24 @@ public class ClusterFailureDetectionUtil {
       System.out.println(diffMap);
    }
 
-   public List<File> getServerLogs(String jgroupsLogFolder) {
-      List<File> serverLogs = new ArrayList<>();
-      String fileNameRegex = "server-\\d.log";
+   public List<File> getTsharkLogs(String root) {
+      return getLogs(root,"server-\\d-tshark.dump");
+   }
 
-      File folder = new File(jgroupsLogFolder);
+   public List<File> getServerLogs(String root) {
+      return getLogs(root,"server-\\d.log");
+   }
+
+   public List<File> getLogs(String root, String regex) {
+      List<File> serverLogs = new ArrayList<>();
+      String fileNameRegex = regex;
+
+      File folder = new File(root);
       String[] files = folder.list();
 
       for (String fileName : files) {
          if (fileName.matches(fileNameRegex)) {
-            File logFile = new File(jgroupsLogFolder, fileName);
+            File logFile = new File(root, fileName);
             serverLogs.add(logFile);
          }
       }
@@ -204,7 +208,7 @@ public class ClusterFailureDetectionUtil {
       return map;
    }
 
-   public Map<String, List<HeartbeatHeaderData>> get_FD_ALL_TShark(String file, String[] tSharkFields, ZoneId zoneId, Map<String, String> mappings) {
+   public Map<String, List<HeartbeatHeaderData>> get_FD_ALL_TShark(List<File> tsharkLogs, String[] tSharkFields, ZoneId zoneId, Map<String, String> mappings) {
 
       boolean parse = true;
       boolean print_version = true;
@@ -255,42 +259,44 @@ public class ClusterFailureDetectionUtil {
          public void printErr(String message) {}
       };
 
-      try (BufferedReader reader = new BufferedReader(new FileReader(file))){
-         String line = reader.readLine();
-         while (line != null) {
-            if (!(line.contains("packets dropped") || line.contains("packets captured"))) {
-               String[] data = line.split("\t");
-               ZonedDateTime epochTime = null;
-               for (int i = 0; i < tSharkFields.length; i++) {
-                  String tSharkField = tSharkFields[i];
-                  if (FIELD_DATA.equals(tSharkField)) {
-                     try (InputStream result = new ByteArrayInputStream(data[i].getBytes(StandardCharsets.UTF_8))) {
-                        try {
-                           Util.parse(new ParseMessages.BinaryToAsciiInputStream(result), messageConsumer, batchConsumer, false, true);
-                        } catch (Exception e) {
-                           System.out.println(line + " -> " + e.getMessage());
+      for (File file : tsharkLogs) {
+         try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String line = reader.readLine();
+            while (line != null) {
+               if (!(line.contains("packets dropped") || line.contains("packets captured"))) {
+                  String[] data = line.split("\t");
+                  ZonedDateTime epochTime = null;
+                  for (int i = 0; i < tSharkFields.length; i++) {
+                     String tSharkField = tSharkFields[i];
+                     if (FIELD_DATA.equals(tSharkField)) {
+                        try (InputStream result = new ByteArrayInputStream(data[i].getBytes(StandardCharsets.UTF_8))) {
+                           try {
+                              Util.parse(new ParseMessages.BinaryToAsciiInputStream(result), messageConsumer, batchConsumer, false, true);
+                           } catch (Exception e) {
+                              System.out.println(line + " -> " + e.getMessage());
+                           }
                         }
+                     } else if (FIELD_TIME_EPOCH.equals(tSharkField)){
+                        String[] time = data[i].split("\\.");
+                        long epochMilli = Long.valueOf(time[0]) * 1000;
+                        long nanos = Long.valueOf(time[1]);
+                        epochTime = Instant.ofEpochMilli(epochMilli).plusNanos(nanos).atZone(zoneId);
+                     } else {
+                        throw new UnsupportedOperationException(String.format("%s it not a valid tshark field reader", tSharkField));
                      }
-                  } else if (FIELD_TIME_EPOCH.equals(tSharkField)){
-                     String[] time = data[i].split("\\.");
-                     long epochMilli = Long.valueOf(time[0]) * 1000;
-                     long nanos = Long.valueOf(time[1]);
-                     epochTime = Instant.ofEpochMilli(epochMilli).plusNanos(nanos).atZone(zoneId);
-                  } else {
-                     throw new UnsupportedOperationException(String.format("%s it not a valid tshark field reader", tSharkField));
                   }
-               }
 
-               for (EpochMessage message : remaining) {
-                  message.zonedDateTime = epochTime;
-                  all.add(message);
+                  for (EpochMessage message : remaining) {
+                     message.zonedDateTime = epochTime;
+                     all.add(message);
+                  }
+                  remaining.clear();
                }
-               remaining.clear();
+               line = reader.readLine();
             }
-            line = reader.readLine();
+         } catch (IOException e) {
+            e.printStackTrace();
          }
-      } catch (IOException e) {
-         e.printStackTrace();
       }
 
       Map<String, List<HeartbeatHeaderData>> map = new HashMap<>();

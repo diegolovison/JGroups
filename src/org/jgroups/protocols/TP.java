@@ -1559,7 +1559,7 @@ public abstract class TP extends Protocol implements DiagnosticsHandler.ProbeHan
     }
 
 
-    public void doSend(byte[] buf, int offset, int length, Address dest, long whenMessageWasCreated) throws Exception {
+    public void doSend(byte[] buf, int offset, int length, Address dest, Long whenMessageWasCreated) throws Exception {
         if(stats) {
             msg_stats.incrNumMsgsSent(1);
             msg_stats.incrNumBytesSent(length);
@@ -1569,9 +1569,11 @@ public abstract class TP extends Protocol implements DiagnosticsHandler.ProbeHan
         else
             sendToSingleMember(dest, buf, offset, length);
         if (is_trace) {
-            long duration = System.currentTimeMillis() - whenMessageWasCreated;
-            if (duration > 0) {
-                log.trace("%s: network call took %dms", local_addr, duration);
+            if (whenMessageWasCreated != null) {
+                long duration = System.currentTimeMillis() - whenMessageWasCreated;
+                if (duration > 0) {
+                    log.trace("%s: network call took %dms", local_addr, duration);
+                }
             }
         }
     }
